@@ -16,6 +16,7 @@ const routes = [
     name: "login",
     component: () => import("@/views/LoginView.vue"),
   },
+  //dk
   {
     path: "/dang-ky-bac-si",
     name: "register-doctor",

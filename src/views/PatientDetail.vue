@@ -7,15 +7,12 @@ import {
   type Patient,
   type Diagnosis,
 } from "@/services/patients";
-
 const route = useRoute();
 const id = Number(route.params.id);
-
 const patient = ref<Patient | null>(null);
 const diags = ref<Diagnosis[]>([]);
 const loading = ref(false);
 const err = ref("");
-
 onMounted(async () => {
   loading.value = true;
   err.value = "";
@@ -28,7 +25,6 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-
 const age = computed(() => {
   if (!patient.value?.dob) return "";
   const d = new Date(patient.value.dob);
@@ -36,7 +32,6 @@ const age = computed(() => {
   return Math.floor(diff / (365.25 * 24 * 3600 * 1000));
 });
 </script>
-
 <template>
   <div>
     <div class="d-flex align-items-center mb-3">
@@ -45,7 +40,6 @@ const age = computed(() => {
       >
       <h3 class="m-0">Hồ sơ bệnh nhân</h3>
     </div>
-
     <div v-if="err" class="alert alert-danger">{{ err }}</div>
     <div v-else>
       <!-- Thông tin bệnh nhân -->
@@ -61,7 +55,6 @@ const age = computed(() => {
           </div>
         </div>
       </div>
-
       <!-- Lịch sử chẩn đoán -->
       <div class="card">
         <div

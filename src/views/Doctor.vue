@@ -9,6 +9,7 @@ type Doctor = {
   email: string;
   phone?: string;
   specialty?: string;
+  password?: string; // dùng khi thêm mới
 };
 
 const auth = useAuth();
@@ -29,6 +30,7 @@ const form = reactive<Doctor>({
   email: "",
   phone: "",
   specialty: "",
+  password: "",
 });
 
 const canAdmin = computed(() => auth.user?.role === "ADMIN");
@@ -36,7 +38,7 @@ const canAdmin = computed(() => auth.user?.role === "ADMIN");
 async function load() {
   loading.value = true;
   try {
-    const res = await http.get("/Doctors", {
+    const res = await http.get("/api/Doctors", {
       params: {
         q: q.value,
         sort: sort.value,
@@ -45,7 +47,6 @@ async function load() {
         pageSize: pageSize.value,
       },
     });
-    // PagedResult { items, total, page, pageSize } hoặc mảng thuần
     const data = res.data;
     if (Array.isArray(data)) {
       rows.value = data;
@@ -58,6 +59,7 @@ async function load() {
     loading.value = false;
   }
 }
+
 function setSort(s: typeof sort.value) {
   if (sort.value === s) dir.value = dir.value === "asc" ? "desc" : "asc";
   else {
@@ -75,27 +77,37 @@ function openNew() {
     email: "",
     phone: "",
     specialty: "",
+    password: "",
   });
   showModal.value = true;
 }
+
 function openEdit(row: Doctor) {
   editingId.value = row.doctorId;
   Object.assign(form, row);
+  form.password = ""; // reset password khi sửa
   showModal.value = true;
 }
 
 async function save() {
   if (!canAdmin.value) return;
-  const payload = {
-    fullName: form.fullName,
-    email: form.email,
-    phone: form.phone,
-    specialty: form.specialty,
-  };
   if (editingId.value) {
-    await http.put(`/Doctors/${editingId.value}`, payload);
+    // cập nhật bác sĩ
+    await http.put(`/api/Doctors/${editingId.value}`, {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      specialty: form.specialty,
+    });
   } else {
-    await http.post("/Doctors", payload);
+    // thêm mới bác sĩ + user
+    await http.post("/api/Doctors/create-with-user", {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      specialty: form.specialty,
+      password: form.password,
+    });
   }
   showModal.value = false;
   await load();
@@ -104,7 +116,7 @@ async function save() {
 async function remove(id: number) {
   if (!canAdmin.value) return;
   if (!confirm("Xóa bác sĩ này?")) return;
-  await http.delete(`/Doctors/${id}`);
+  await http.delete(`/api/Doctors/${id}`);
   await load();
 }
 
@@ -122,20 +134,11 @@ onMounted(load);
     <div class="d-flex gap-2 align-items-center mb-3">
       <input
         v-model="q"
-        @keyup.enter="
-          page = 1;
-          load();
-        "
+        @keyup.enter="(page = 1), load()"
         class="form-control"
         placeholder="Tìm theo tên, email, số ĐT, chuyên khoa"
       />
-      <button
-        class="btn btn-outline-secondary"
-        @click="
-          page = 1;
-          load();
-        "
-      >
+      <button class="btn btn-outline-secondary" @click="(page = 1), load()">
         Tìm
       </button>
       <button
@@ -199,10 +202,7 @@ onMounted(load);
         <button
           class="btn btn-sm btn-outline-secondary"
           :disabled="page === 1"
-          @click="
-            page--;
-            load();
-          "
+          @click="page--, load()"
         >
           «
         </button>
@@ -210,10 +210,7 @@ onMounted(load);
         <button
           class="btn btn-sm btn-outline-secondary"
           :disabled="page * pageSize >= total"
-          @click="
-            page++;
-            load();
-          "
+          @click="page++, load()"
         >
           »
         </button>
@@ -251,6 +248,14 @@ onMounted(load);
             <div class="mb-2">
               <label class="form-label">Chuyên khoa</label>
               <input v-model="form.specialty" class="form-control" />
+            </div>
+            <div class="mb-2" v-if="!editingId">
+              <label class="form-label">Mật khẩu</label>
+              <input
+                v-model="form.password"
+                class="form-control"
+                type="password"
+              />
             </div>
           </div>
           <div class="modal-footer">

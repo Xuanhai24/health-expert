@@ -33,13 +33,18 @@ function doLogout() {
 </script>
 
 <template>
-  <!-- Nếu ở trang login thì ẩn sidebar và chỉ render nội dung -->
+  <!-- 1. Trang đăng nhập -->
   <div v-if="route.name === 'login'" class="vh-100">
     <RouterView />
   </div>
 
-  <!-- Layout chính (chỉ khi đã đăng nhập) -->
-  <div v-else class="d-flex vh-100" v-if="auth.user">
+  <!-- 2. Các trang công khai (requiresAuth: false) -->
+  <div v-else-if="!auth.user">
+    <RouterView />
+  </div>
+
+  <!-- 3. Layout chính (các trang yêu cầu đăng nhập) -->
+  <div v-else class="d-flex vh-100">
     <!-- Sidebar -->
     <aside
       class="sidebar d-flex flex-column bg-dark text-white"
@@ -69,14 +74,14 @@ function doLogout() {
           v-if="allow(['ADMIN', 'DOCTOR'])"
           to="/chuan-doan"
           class="nav-item d-block px-3 py-2 rounded text-white text-decoration-none mb-2 router-link"
-          >Chuẩn đoán</RouterLink
+          >🩺 Chuẩn đoán</RouterLink
         >
 
         <RouterLink
           v-if="allow(['ADMIN', 'DOCTOR'])"
           to="/kien-thuc"
           class="nav-item d-block px-3 py-2 rounded text-white text-decoration-none mb-2 router-link"
-          >Quản lý tri thức y khoa</RouterLink
+          >📚 Quản lý tri thức y khoa</RouterLink
         >
 
         <!-- Chỉ ADMIN mới thấy -->
@@ -84,7 +89,7 @@ function doLogout() {
           v-if="isAdmin"
           to="/bac-si"
           class="nav-item d-block px-3 py-2 rounded text-white text-decoration-none mb-2 router-link"
-          >Quản lý bác sĩ</RouterLink
+          >👨‍⚕️ Quản lý bác sĩ</RouterLink
         >
 
         <RouterLink
@@ -98,7 +103,7 @@ function doLogout() {
           v-if="isAdmin"
           to="/thong-ke"
           class="nav-item d-block px-3 py-2 rounded text-white text-decoration-none mb-2 router-link"
-          >Thống kê & báo cáo</RouterLink
+          >📊 Thống kê & báo cáo</RouterLink
         >
       </nav>
 

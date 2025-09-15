@@ -19,49 +19,49 @@ export interface Rule {
 }
 
 export async function getSymptoms() {
-  const { data } = await http.get("/Symptoms");
+  const { data } = await http.get("/api/Symptoms");
   return data as Symptom[];
 }
 export async function createSymptom(p: Omit<Symptom, "symptomId">) {
-  const { data } = await http.post("/Symptoms", p);
+  const { data } = await http.post("/api/Symptoms", p);
   return data as Symptom;
 }
 export async function updateSymptom(id: number, p: Omit<Symptom, "symptomId">) {
-  const { data } = await http.put(`/Symptoms/${id}`, p);
+  const { data } = await http.put(`/api/Symptoms/${id}`, p);
   return data as Symptom;
 }
 export async function deleteSymptom(id: number) {
-  await http.delete(`/Symptoms/${id}`);
+  await http.delete(`/api/Symptoms/${id}`);
 }
 
 export async function getDiseases() {
-  const { data } = await http.get("/Diseases");
+  const { data } = await http.get("/api/Diseases");
   return data as Disease[];
 }
 export async function createDisease(p: Omit<Disease, "diseaseId">) {
-  const { data } = await http.post("/Diseases", p);
+  const { data } = await http.post("/api/Diseases", p);
   return data as Disease;
 }
 export async function updateDisease(id: number, p: Omit<Disease, "diseaseId">) {
-  const { data } = await http.put(`/Diseases/${id}`, p);
+  const { data } = await http.put(`/api/Diseases/${id}`, p);
   return data as Disease;
 }
 export async function deleteDisease(id: number) {
-  await http.delete(`/Diseases/${id}`);
+  await http.delete(`/api/Diseases/${id}`);
 }
 
 export async function getRules() {
-  const { data } = await http.get("/Rules");
+  const { data } = await http.get("/api/Rules");
   return data as Rule[];
 }
 export async function createRule(p: Omit<Rule, "ruleId">) {
-  const { data } = await http.post("/Rules", p);
+  const { data } = await http.post("/api/Rules", p);
   return data as Rule;
 }
 export async function updateRule(id: number, p: Omit<Rule, "ruleId">) {
-  const { data } = await http.put(`/Rules/${id}`, p);
+  const { data } = await http.put(`/api/Rules/${id}`, p);
   return data as Rule;
 }
 export async function deleteRule(id: number) {
-  await http.delete(`/Rules/${id}`);
+  await http.delete(`/api/Rules/${id}`);
 }

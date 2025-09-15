@@ -1,31 +1,35 @@
 import { http } from "@/lib/http";
 
 export async function getSymptomList(): Promise<string[]> {
-  const { data } = await http.get("/api/chan-doan/danh-sach-trieu-chung");
+  const { data } = await http.get("/api/chuan-doan-benh/danh-sach-trieu-chung");
   return data as string[];
 }
 
+// Interface mô tả kết quả trả về từ backend
 export interface DiagnoseResult {
-  disease?: string;
-  confidence?: number; // 0..1
-  explanation?: string;
+  name: string; // tên bệnh
+  score: number; // độ tin cậy (0..1)
+  matchedSymptoms: string[]; // triệu chứng khớp
+  unmatchedSymptoms: string[]; // triệu chứng không khớp
 }
 
+// Hàm gọi API chuẩn đoán, trả về mảng
 export async function runDiagnosis(
   symptoms: string[]
-): Promise<DiagnoseResult> {
-  const { data } = await http.post("/api/chan-doan/thuc-hien", symptoms);
-  return data as DiagnoseResult;
+): Promise<DiagnoseResult[]> {
+  const { data } = await http.post("/api/chuan-doan-benh/chuan-doan", symptoms);
+  return data as DiagnoseResult[];
 }
 
 // Lưu lịch sử chẩn đoán
 export async function saveDiagnosis(payload: {
   patientId: number;
-  symptoms: string[];
-  disease?: string;
-  confidence?: number;
-  result?: string; // text summary
+  Symptoms: string;
+  Diseases: string;
+  medicinesAdvice: string;
+  doctorAdvice: string;
+  diagnoseDate: string;
+  doctorName: string;
 }) {
-  const { data } = await http.post("/api/Diagnoses", payload);
-  return data;
+  return await http.post("/api/chuan-doan-benh/luu-ket-qua", payload);
 }
