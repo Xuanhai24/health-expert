@@ -1,8 +1,16 @@
 import { http } from "@/lib/http";
+import axios, { AxiosError } from "axios";
 
 export async function getSymptomList(): Promise<string[]> {
-  const { data } = await http.get("/api/chuan-doan-benh/danh-sach-trieu-chung");
-  return data as string[];
+  try {
+    const { data } = await http.get("/api/chuan-doan-benh/danh-sach-trieu-chung");
+    return data as string[];
+  } catch (error) {
+    if(axios.isAxiosError(error)) {
+      throw new AxiosError(error.response?.data);
+    }
+  }
+  return [];
 }
 
 // Interface mô tả kết quả trả về từ backend
@@ -17,19 +25,33 @@ export interface DiagnoseResult {
 export async function runDiagnosis(
   symptoms: string[]
 ): Promise<DiagnoseResult[]> {
-  const { data } = await http.post("/api/chuan-doan-benh/chuan-doan", symptoms);
-  return data as DiagnoseResult[];
+  try{
+    const { data } = await http.post("/api/chuan-doan-benh/chuan-doan", symptoms);
+    return data as DiagnoseResult[];
+  } catch (error) {
+    if(axios.isAxiosError(error)) {
+      throw new AxiosError(error.response?.data);
+    }
+    return [];
+  }
 }
 
 // Lưu lịch sử chẩn đoán
 export async function saveDiagnosis(payload: {
-  patientId: number;
-  Symptoms: string;
-  Diseases: string;
-  medicinesAdvice: string;
-  doctorAdvice: string;
-  diagnoseDate: string;
-  doctorName: string;
+  patientId?: number | string;
+  Symptoms?: string;
+  Diseases?: string;
+  medicinesAdvice?: string;
+  doctorAdvice?: string;
+  diagnoseDate?: string;
+  doctorName?: string;
 }) {
-  return await http.post("/api/chuan-doan-benh/luu-ket-qua", payload);
+  try{
+    const res = await http.post("/api/chuan-doan-benh/luu-ket-qua", payload);
+    return res.status;
+  } catch (error) {
+    if(axios.isAxiosError(error)) {
+      throw new AxiosError(error.response?.data?.errors);
+    }
+  }
 }
