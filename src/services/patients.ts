@@ -1,11 +1,12 @@
 // src/services/patients.ts
 import { http } from "@/lib/http";
+import axios, { AxiosError } from "axios";
 
 // ================== Bệnh nhân ==================
 export interface Patient {
   patientId: number;
   fullName: string;
-  dob: string; // ISO yyyy-MM-dd
+  dob: string; // ISO yyyy-MM -dd
   gender: "Nam" | "Nữ";
 }
 
@@ -61,6 +62,19 @@ export async function deletePatient(id: number) {
 export async function getPatient(id: number) {
   const { data } = await http.get(`/api/Patients/${id}`);
   return data as Patient;
+}
+
+export async function searchByPatientId(id: number) {
+  try{
+    const { data , status } = await http.get(`/api/Patients/Search?id=${id}`);
+    console.log("Response status:", status);
+    return data as Patient[];
+  }catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new AxiosError(error.response?.data);
+    }
+    return [];
+  }
 }
 
 // ================== Chẩn đoán ==================
